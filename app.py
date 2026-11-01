@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 import streamlit as st
+import streamlit.components.v1 as components
 import plotly.express as px
 import plotly.graph_objects as go
 from reportlab.lib import colors
@@ -69,13 +70,35 @@ st.markdown(f"""
     #MainMenu,
     footer,
     .viewerBadge_container__r5tak,
-    .viewerBadge_link__1S137 {{
+    .viewerBadge_link__1S137,
+    [data-testid="manage-app-button"],
+    #manage-app-button,
+    button[data-testid="manage-app-button"],
+    div[class*="manageApp"],
+    button[class*="manageApp"],
+    a[class*="manageApp"],
+    div[class*="viewerBadge"],
+    a[class*="viewerBadge"],
+    div[class*="FloatingContainer"],
+    div[style*="position: fixed"][style*="bottom:"],
+    div[style*="position:fixed"][style*="bottom:"],
+    button[style*="position: fixed"][style*="bottom:"],
+    button[style*="position:fixed"][style*="bottom:"],
+    a[style*="position: fixed"][style*="bottom:"],
+    a[style*="position:fixed"][style*="bottom:"],
+    iframe[title*="manage-app"],
+    iframe[title*="Manage app"] {{
         display: none !important;
         visibility: hidden !important;
         height: 0px !important;
         width: 0px !important;
         opacity: 0 !important;
         pointer-events: none !important;
+        transform: scale(0) !important;
+        position: absolute !important;
+        bottom: -9999px !important;
+        right: -9999px !important;
+        z-index: -9999 !important;
     }}
     
     html, body, [class*="css"], .stApp {{
@@ -469,6 +492,41 @@ st.markdown(f"""
     }}
 </style>
 """, unsafe_allow_html=True)
+
+# Client-side removal of floating badges and host toolbars
+components.html("""
+<script>
+function purgeHostBadges() {
+    try {
+        const contexts = [document, window.parent ? window.parent.document : null];
+        contexts.forEach(ctx => {
+            if (!ctx) return;
+            const selectors = [
+                '[data-testid="manage-app-button"]',
+                '#manage-app-button',
+                '.viewerBadge_container__r5tak',
+                '.viewerBadge_link__1S137',
+                '[class*="viewerBadge"]',
+                '[class*="manageApp"]',
+                '[class*="manage-app"]',
+                '[class*="ManageApp"]',
+                'div[data-testid="stStatusWidget"]'
+            ];
+            selectors.forEach(sel => {
+                const nodes = ctx.querySelectorAll(sel);
+                nodes.forEach(n => {
+                    n.style.display = 'none';
+                    n.style.visibility = 'hidden';
+                    try { n.remove(); } catch(e) {}
+                });
+            });
+        });
+    } catch(e) {}
+}
+setInterval(purgeHostBadges, 300);
+document.addEventListener("DOMContentLoaded", purgeHostBadges);
+</script>
+""", height=0, width=0)
 
 def format_minimal_chart(fig, title, yaxis_title=""):
     """Format Plotly charts with the FPEL high-contrast dark minimal aesthetic."""
@@ -1225,7 +1283,7 @@ with tabs[1]:
                 
             c_btn1, c_btn2 = st.columns(2)
             with c_btn1:
-                if st.button("Reset to Default Plan", use_container_width=True):
+                if st.button("Reset to Default Plan", width="stretch"):
                     st.session_state.scenario_choice = SCENARIOS[0]
                     apply_scenario_preset()
                     st.session_state.custom_data_pack = None
@@ -1277,7 +1335,7 @@ with tabs[2]:
         "Aluminium MCX (₹/kg)": base_al_monthly.round(0),
         "AC Cable Price (₹/m)": ac_monthly_prices.round(2),
     })
-    st.dataframe(fc_price_df, use_container_width=True)
+    st.dataframe(fc_price_df, width="stretch")
     
     # Plotly Forecast Chart
     fig_p = go.Figure()
@@ -1294,7 +1352,7 @@ with tabs[2]:
         annotation_font=dict(size=11, color=SUCCESS_COLOR)
     )
     format_minimal_chart(fig_p, "Fabricated GI Structure Price: Rate Lock vs Monthly Forecast", "₹ / kg")
-    st.plotly_chart(fig_p, use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(fig_p, width="stretch", config={"displayModeBar": False})
 
 # =============================================================================
 # TAB 4: PIPELINE DEMAND ENGINE
@@ -1312,13 +1370,13 @@ with tabs[3]:
             "Negotiation": f"{neg_conv*100:.0f}%",
             "Early (proposal sent)": f"{early_conv*100:.0f}%"
         })
-        st.dataframe(stage_df, use_container_width=True)
+        st.dataframe(stage_df, width="stretch")
         
     with col_d2:
         st.markdown("#### Roof Type Breakdown")
         roof_df = pipe.groupby("Roof type")["Est. capacity (kWp)"].agg(["count", "sum"]).reset_index()
         roof_df.columns = ["Roof Type", "Projects Count", "Total Capacity (kWp)"]
-        st.dataframe(roof_df, use_container_width=True)
+        st.dataframe(roof_df, width="stretch")
         
     st.markdown("#### Monthly Material Demand Schedule")
     m_dem_df = pd.DataFrame({
@@ -1335,7 +1393,7 @@ with tabs[3]:
         "DC Cable per Polarity (m)": "{:,.0f}",
         "Combined DC Cable (m)": "{:,.0f}",
         "Aluminium AC Cable (m)": "{:,.0f}"
-    }), use_container_width=True)
+    }), width="stretch")
     
     with st.expander("View Transparent Demand Calculation Formulas"):
         st.markdown(r"""
@@ -1362,7 +1420,7 @@ with tabs[4]:
         "Total_Usable": "{:,.0f}",
         "Avg monthly issue (Jul-Sep)": "{:,.1f}",
         "Stock Cover (Days)": "{:.1f} d"
-    }), use_container_width=True)
+    }), width="stretch")
     
     st.markdown("---")
     st.markdown("#### DC Cable Network Rebalancing: Ahmedabad → Pune")
@@ -1411,7 +1469,7 @@ with tabs[5]:
         "AC Spend (₹)": "₹{:,.0f}",
         "Total Monthly Spend (₹)": "₹{:,.0f}",
         "Monthly Carrying Cost (₹)": "₹{:,.0f}"
-    }), use_container_width=True)
+    }), width="stretch")
     
     st.markdown(f"**Total Six-Month Procurement Spend:** `₹{tot_6m_spend/1e5:,.2f} Lakhs` (₹{tot_6m_spend/1e7:.2f} Crore)")
     
@@ -1422,14 +1480,14 @@ with tabs[5]:
     fig_cf.add_trace(go.Bar(x=months, y=[s/1e5 for s in ac_spends], name="AC Cable", marker_color=SUCCESS_COLOR))
     format_minimal_chart(fig_cf, "Monthly Procurement Cash Outflow Bridge (₹ Lakhs)", "₹ Lakhs")
     fig_cf.update_layout(barmode="stack")
-    st.plotly_chart(fig_cf, use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(fig_cf, width="stretch", config={"displayModeBar": False})
 
 # =============================================================================
 # TAB 7: FORENSIC AUDIT & EXPORTS
 # =============================================================================
 with tabs[6]:
     st.markdown("### Forensic Data Health Audit & Export Center")
-    st.dataframe(audit_df, use_container_width=True)
+    st.dataframe(audit_df, width="stretch")
     
     st.markdown("---")
     c_e1, c_e2 = st.columns(2)
@@ -1448,7 +1506,7 @@ with tabs[6]:
             data=buf_xls.getvalue(),
             file_name=f"FPEL_Procurement_Plan_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            use_container_width=True
+            width="stretch"
         )
         
     with c_e2:
@@ -1499,5 +1557,5 @@ with tabs[6]:
             data=buf_pdf.getvalue(),
             file_name=f"FPEL_Material_Procurement_Decision_Memo_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
             mime="application/pdf",
-            use_container_width=True
+            width="stretch"
         )
