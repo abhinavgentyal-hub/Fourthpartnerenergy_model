@@ -7,6 +7,7 @@ Grounded strictly in Kit-to-Site_Data_Pack.xlsx and Kit-to-Site_Case_Brief.pdf
 
 import os
 import io
+import base64
 from pathlib import Path
 from datetime import datetime, timedelta
 import pandas as pd
@@ -18,7 +19,18 @@ import plotly.graph_objects as go
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image as RLImage
+
+# -----------------------------------------------------------------------------
+# BRAND ASSETS (FOURTH PARTNER ENERGY OFFICIAL LOGO)
+# -----------------------------------------------------------------------------
+ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+LOGO_PATH = os.path.join(ASSETS_DIR, "fpel_logo.png")
+if os.path.exists(LOGO_PATH):
+    with open(LOGO_PATH, "rb") as _f:
+        FPEL_LOGO_B64 = base64.b64encode(_f.read()).decode("utf-8")
+else:
+    FPEL_LOGO_B64 = ""
 
 # -----------------------------------------------------------------------------
 # PAGE CONFIGURATION & FPEL DARK ENTERPRISE THEME
@@ -191,7 +203,31 @@ st.markdown(f"""
         z-index: 1;
     }}
     
-    .fpel-logo-svg {{
+    .fpel-logo-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #FFFFFF;
+        padding: 6px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.8);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+    }
+    
+    .fpel-logo-badge:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 24px rgba(2, 132, 199, 0.4);
+    }
+    
+    .fpel-logo-img {
+        height: 48px;
+        width: auto;
+        display: block;
+        object-fit: contain;
+    }
+    
+    .fpel-logo-svg {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -200,24 +236,36 @@ st.markdown(f"""
         border-radius: 12px;
         border: 1px solid rgba(255, 255, 255, 0.15);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    }}
+    }
     
-    .fpel-title-box h1 {{
+    .fpel-title-box h1 {
         color: #FFFFFF !important;
-        font-size: 22px !important;
+        font-size: 21px !important;
         font-weight: 800 !important;
         margin: 0 !important;
-        letter-spacing: 0.8px !important;
+        letter-spacing: 0.6px !important;
         text-transform: uppercase;
-    }}
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .fpel-title-tag {
+        font-size: 13.5px !important;
+        color: #38BDF8 !important;
+        font-weight: 600 !important;
+        text-transform: none !important;
+        letter-spacing: 0.2px !important;
+    }
     
-    .fpel-title-box p {{
+    .fpel-title-box p {
         color: #94A3B8 !important;
         font-size: 13px !important;
         margin: 4px 0 0 0 !important;
         font-weight: 500;
         letter-spacing: 0.2px;
-    }}
+    }
     
     .fpel-meta-badges {{
         display: flex;
@@ -1039,21 +1087,25 @@ tot_carry_cost = sum(gi_carry_costs) + sum(dc_carry_costs) + sum(ac_carry_costs)
 # -----------------------------------------------------------------------------
 # FPEL BRAND MASTHEAD (MATCHING FOURTHPARTNER.CO OFFICIAL IDENTITY)
 # -----------------------------------------------------------------------------
+logo_html = f'<div class="fpel-logo-badge"><img src="data:image/png;base64,{FPEL_LOGO_B64}" alt="Fourth Partner Energy" class="fpel-logo-img"></div>' if FPEL_LOGO_B64 else '''
+<div class="fpel-logo-svg">
+    <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="11" r="4.5" fill="#FFFFFF"/>
+        <path d="M10 20C14 16 26 16 30 20" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+        <rect x="13" y="24" width="3.5" height="12" rx="1.5" fill="#FFFFFF"/>
+        <rect x="18.25" y="22" width="3.5" height="14" rx="1.5" fill="#FFFFFF"/>
+        <rect x="23.5" y="24" width="3.5" height="12" rx="1.5" fill="#FFFFFF"/>
+    </svg>
+</div>
+'''
+
 st.markdown(f"""
 <div class="fpel-masthead">
     <div class="fpel-brand-wrap">
-        <div class="fpel-logo-svg">
-            <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
-                <circle cx="20" cy="11" r="4.5" fill="#FFFFFF"/>
-                <path d="M10 20C14 16 26 16 30 20" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
-                <rect x="13" y="24" width="3.5" height="12" rx="1.5" fill="#FFFFFF"/>
-                <rect x="18.25" y="22" width="3.5" height="14" rx="1.5" fill="#FFFFFF"/>
-                <rect x="23.5" y="24" width="3.5" height="12" rx="1.5" fill="#FFFFFF"/>
-            </svg>
-        </div>
+        {logo_html}
         <div class="fpel-title-box">
-            <h1>FOURTH PARTNER ENERGY</h1>
-            <p>Material Buy-or-Hold Forecaster · Kit-to-Site Operations Decision Engine</p>
+            <h1>FOURTH PARTNER ENERGY <span class="fpel-title-tag">| Kit-to-Site Operations Engine</span></h1>
+            <p>Material Buy-or-Hold Forecaster · 6-Month Operations & Procurement Optimizer</p>
         </div>
     </div>
     <div class="fpel-meta-badges">
@@ -1605,8 +1657,20 @@ with tabs[6]:
         p_styles = getSampleStyleSheet()
         
         pdf_story = []
-        pdf_story.append(Paragraph("FOURTH PARTNER ENERGY LIMITED (FPEL)", ParagraphStyle("T1", parent=p_styles["Heading1"], fontSize=16, leading=20, textColor=colors.HexColor("#0B1329"))))
-        pdf_story.append(Paragraph("Kit-to-Site Operations Advisory — Material Buy-or-Hold Decision Memo", ParagraphStyle("T2", parent=p_styles["Normal"], fontSize=9, textColor=colors.HexColor("#64748B"))))
+        if os.path.exists(LOGO_PATH):
+            pdf_logo = RLImage(LOGO_PATH, width=75, height=50)
+            title_p = Paragraph("<b>FOURTH PARTNER ENERGY LIMITED (FPEL)</b><br/><font size=9 color='#64748B'>Kit-to-Site Operations Advisory — Material Buy-or-Hold Decision Memo</font>", ParagraphStyle("T1", parent=p_styles["Heading1"], fontSize=14, leading=18, textColor=colors.HexColor("#0B1329")))
+            head_tbl = Table([[pdf_logo, title_p]], colWidths=[85, 435])
+            head_tbl.setStyle(TableStyle([
+                ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+                ('LEFTPADDING', (0,0), (-1,-1), 0),
+                ('RIGHTPADDING', (0,0), (-1,-1), 0),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 6),
+            ]))
+            pdf_story.append(head_tbl)
+        else:
+            pdf_story.append(Paragraph("FOURTH PARTNER ENERGY LIMITED (FPEL)", ParagraphStyle("T1", parent=p_styles["Heading1"], fontSize=16, leading=20, textColor=colors.HexColor("#0B1329"))))
+            pdf_story.append(Paragraph("Kit-to-Site Operations Advisory — Material Buy-or-Hold Decision Memo", ParagraphStyle("T2", parent=p_styles["Normal"], fontSize=9, textColor=colors.HexColor("#64748B"))))
         pdf_story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor(ACCENT_GOLD), spaceAfter=10))
         
         pdf_story.append(Paragraph("<b>1. EXECUTIVE BUY-OR-HOLD DECISION SCORECARD</b>", ParagraphStyle("H1", parent=p_styles["Heading2"], fontSize=11, leading=14, textColor=colors.HexColor("#0B1329"))))
