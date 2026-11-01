@@ -56,6 +56,28 @@ st.markdown(f"""
         display: none !important;
     }}
     
+    /* Completely hide Streamlit Share top header bar, toolbar, decoration line, and footer */
+    header[data-testid="stHeader"],
+    [data-testid="stHeader"],
+    .stApp > header,
+    div[data-testid="stDecoration"],
+    div[data-testid="stToolbar"],
+    div[data-testid="stToolbarActions"],
+    div[data-testid="stStatusWidget"],
+    div[data-testid="stAppDeployButton"],
+    div[data-testid="stMainMenu"],
+    #MainMenu,
+    footer,
+    .viewerBadge_container__r5tak,
+    .viewerBadge_link__1S137 {{
+        display: none !important;
+        visibility: hidden !important;
+        height: 0px !important;
+        width: 0px !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }}
+    
     html, body, [class*="css"], .stApp {{
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         color: {TEXT_LIGHT};
