@@ -61,6 +61,7 @@ st.markdown(f"""
     header[data-testid="stHeader"],
     [data-testid="stHeader"],
     .stApp > header,
+    header,
     div[data-testid="stDecoration"],
     div[data-testid="stToolbar"],
     div[data-testid="stToolbarActions"],
@@ -70,16 +71,25 @@ st.markdown(f"""
     #MainMenu,
     footer,
     .viewerBadge_container__r5tak,
+    .viewerBadge_container__1QSob,
+    .styles_viewerBadge__1yB5_,
     .viewerBadge_link__1S137,
+    .viewerBadge_text__1JaDK,
+    [class*="viewerBadge"],
     [data-testid="manage-app-button"],
     #manage-app-button,
     button[data-testid="manage-app-button"],
     div[class*="manageApp"],
     button[class*="manageApp"],
     a[class*="manageApp"],
-    div[class*="viewerBadge"],
-    a[class*="viewerBadge"],
+    div[class*="ManageApp"],
+    button[class*="ManageApp"],
+    a[class*="ManageApp"],
+    div[class*="manage_app"],
+    [id*="manage-app"],
     div[class*="FloatingContainer"],
+    div:has(> [class*="viewerBadge"]),
+    div:has(> [class*="manageApp"]),
     div[style*="position: fixed"][style*="bottom:"],
     div[style*="position:fixed"][style*="bottom:"],
     button[style*="position: fixed"][style*="bottom:"],
@@ -496,35 +506,114 @@ st.markdown(f"""
 # Client-side removal of floating badges and host toolbars
 components.html("""
 <script>
-function purgeHostBadges() {
-    try {
-        const contexts = [document, window.parent ? window.parent.document : null];
-        contexts.forEach(ctx => {
-            if (!ctx) return;
-            const selectors = [
-                '[data-testid="manage-app-button"]',
-                '#manage-app-button',
-                '.viewerBadge_container__r5tak',
-                '.viewerBadge_link__1S137',
-                '[class*="viewerBadge"]',
-                '[class*="manageApp"]',
-                '[class*="manage-app"]',
-                '[class*="ManageApp"]',
-                'div[data-testid="stStatusWidget"]'
-            ];
-            selectors.forEach(sel => {
-                const nodes = ctx.querySelectorAll(sel);
-                nodes.forEach(n => {
-                    n.style.display = 'none';
-                    n.style.visibility = 'hidden';
-                    try { n.remove(); } catch(e) {}
+(function() {
+    function injectPurgeStyles(ctx) {
+        try {
+            if (!ctx || !ctx.head) return;
+            const styleId = 'fpel-purge-host-style';
+            if (ctx.getElementById(styleId)) return;
+            const style = ctx.createElement('style');
+            style.id = styleId;
+            style.textContent = `
+                header[data-testid="stHeader"],
+                [data-testid="stHeader"],
+                div[data-testid="stToolbar"],
+                div[data-testid="stToolbarActions"],
+                div[data-testid="stDecoration"],
+                div[data-testid="stStatusWidget"],
+                div[data-testid="stAppDeployButton"],
+                #MainMenu,
+                footer,
+                [data-testid="manage-app-button"],
+                #manage-app-button,
+                [id*="manage-app"],
+                .viewerBadge_container__r5tak,
+                .viewerBadge_container__1QSob,
+                .styles_viewerBadge__1yB5_,
+                .viewerBadge_link__1S137,
+                .viewerBadge_text__1JaDK,
+                [class*="viewerBadge"],
+                [class*="manageApp"],
+                [class*="ManageApp"],
+                [class*="manage_app"],
+                div[class*="FloatingContainer"],
+                div:has(> [class*="viewerBadge"]),
+                div:has(> [class*="manageApp"]),
+                iframe[title*="Manage app"],
+                iframe[title*="manage-app"] {
+                    display: none !important;
+                    visibility: hidden !important;
+                    opacity: 0 !important;
+                    height: 0px !important;
+                    width: 0px !important;
+                    pointer-events: none !important;
+                    position: absolute !important;
+                    bottom: -9999px !important;
+                    right: -9999px !important;
+                    z-index: -9999 !important;
+                }
+            `;
+            ctx.head.appendChild(style);
+        } catch(e) {}
+    }
+
+    function purgeHostBadges() {
+        try {
+            const contexts = [];
+            try { if (document) contexts.push(document); } catch(e) {}
+            try { if (window.parent && window.parent.document) contexts.push(window.parent.document); } catch(e) {}
+            try { if (window.top && window.top.document) contexts.push(window.top.document); } catch(e) {}
+
+            contexts.forEach(ctx => {
+                if (!ctx) return;
+                injectPurgeStyles(ctx);
+                const selectors = [
+                    '[data-testid="manage-app-button"]',
+                    '#manage-app-button',
+                    '[id*="manage-app"]',
+                    '.viewerBadge_container__r5tak',
+                    '.viewerBadge_container__1QSob',
+                    '.styles_viewerBadge__1yB5_',
+                    '.viewerBadge_link__1S137',
+                    '.viewerBadge_text__1JaDK',
+                    '[class*="viewerBadge"]',
+                    '[class*="manageApp"]',
+                    '[class*="manage-app"]',
+                    '[class*="ManageApp"]',
+                    '[class*="manage_app"]',
+                    'header[data-testid="stHeader"]',
+                    'div[data-testid="stToolbar"]',
+                    'div[data-testid="stToolbarActions"]',
+                    'div[data-testid="stStatusWidget"]'
+                ];
+                selectors.forEach(sel => {
+                    try {
+                        const nodes = ctx.querySelectorAll(sel);
+                        nodes.forEach(n => {
+                            n.style.setProperty('display', 'none', 'important');
+                            n.style.setProperty('visibility', 'hidden', 'important');
+                            n.style.setProperty('opacity', '0', 'important');
+                            try { n.remove(); } catch(err) {}
+                        });
+                    } catch(err) {}
                 });
             });
-        });
+        } catch(e) {}
+    }
+
+    purgeHostBadges();
+    setInterval(purgeHostBadges, 250);
+    document.addEventListener("DOMContentLoaded", purgeHostBadges);
+    window.addEventListener("load", purgeHostBadges);
+
+    try {
+        const obs = new MutationObserver(purgeHostBadges);
+        obs.observe(document.body || document.documentElement, { childList: true, subtree: true });
+        if (window.parent && window.parent.document && window.parent.document.body) {
+            obs.observe(window.parent.document.body, { childList: true, subtree: true });
+        }
     } catch(e) {}
-}
-setInterval(purgeHostBadges, 300);
-document.addEventListener("DOMContentLoaded", purgeHostBadges);
+})();
 </script>
 """, height=0, width=0)
 
