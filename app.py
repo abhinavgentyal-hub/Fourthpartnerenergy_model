@@ -203,7 +203,7 @@ st.markdown(f"""
         z-index: 1;
     }}
     
-    .fpel-logo-badge {
+    .fpel-logo-badge {{
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -213,21 +213,21 @@ st.markdown(f"""
         border: 1px solid rgba(255, 255, 255, 0.4);
         box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.8);
         transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
-    }
+    }}
     
-    .fpel-logo-badge:hover {
+    .fpel-logo-badge:hover {{
         transform: translateY(-1px);
         box-shadow: 0 6px 24px rgba(2, 132, 199, 0.4);
-    }
+    }}
     
-    .fpel-logo-img {
+    .fpel-logo-img {{
         height: 48px;
         width: auto;
         display: block;
         object-fit: contain;
-    }
+    }}
     
-    .fpel-logo-svg {
+    .fpel-logo-svg {{
         display: flex;
         align-items: center;
         justify-content: center;
@@ -236,9 +236,9 @@ st.markdown(f"""
         border-radius: 12px;
         border: 1px solid rgba(255, 255, 255, 0.15);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    }
+    }}
     
-    .fpel-title-box h1 {
+    .fpel-title-box h1 {{
         color: #FFFFFF !important;
         font-size: 21px !important;
         font-weight: 800 !important;
@@ -249,23 +249,23 @@ st.markdown(f"""
         align-items: center;
         flex-wrap: wrap;
         gap: 8px;
-    }
+    }}
 
-    .fpel-title-tag {
+    .fpel-title-tag {{
         font-size: 13.5px !important;
         color: #38BDF8 !important;
         font-weight: 600 !important;
         text-transform: none !important;
         letter-spacing: 0.2px !important;
-    }
+    }}
     
-    .fpel-title-box p {
+    .fpel-title-box p {{
         color: #94A3B8 !important;
         font-size: 13px !important;
         margin: 4px 0 0 0 !important;
         font-weight: 500;
         letter-spacing: 0.2px;
-    }
+    }}
     
     .fpel-meta-badges {{
         display: flex;
